@@ -13,19 +13,21 @@ __bundle() {
   local prev=$3
   local bundle_command
   __bundle_get_command
-  COMPREPLY=()
 
   local options
   if [[ $cur = -* ]]; then
-      options="--no-color --verbose"
-      if [[ -z $bundle_command ]]; then
-          options="$options --version --help"
-      fi
+    options="--no-color --verbose"
+    if [[ -z $bundle_command ]]; then
+      options="$options --version --help"
+    fi
+  elif [[ $bundle_command = "exec" ]]; then
+    _bundle_exec_completions
+    return
   else
-      if [[ -z $bundle_command || $bundle_command = help ]]; then
-          options="help install update package exec config check list show
-                   console open viz init gem"
-      fi
+    if [[ -z $bundle_command || $bundle_command = help ]]; then
+      options="help install update package exec config check list show
+      console open viz init gem"
+    fi
   fi
   COMPREPLY=($(compgen -W "$options" -- "$cur"))
 }
@@ -53,3 +55,10 @@ __bundle_get_command() {
 
 complete -F __bundle -o bashdefault -o default bundle
 # vim: ai ft=sh sw=4 sts=2 et
+
+_bundle_exec_completions()
+{
+  if [[ $COMP_CWORD = 2 ]]; then
+    COMPREPLY=($(compgen -c -- "$2"))
+  fi
+}
